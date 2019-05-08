@@ -1,0 +1,3 @@
+function demoMain() {
+	demo1();
+}

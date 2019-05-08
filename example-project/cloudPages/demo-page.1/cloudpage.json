@@ -1,0 +1,16 @@
+{
+	"author": "joern.berkefeld@gmail.com",
+	"server": {
+		"coreVersion": "1.1.1",
+		"scriptAttributes": {
+			"executioncontexttype": "post"
+		},
+		"dependencies": {
+			"other": ["servr/lib/lib.something.html"],
+			"ssjs": ["server/lib/lib.ab.ssjs", "server/lib/lib.cd.ssjs"]
+		},
+		"src": ["server/server.ssjs"]
+	},
+	"public": ["public/index.html", "public/style.css", "public/app.js"],
+	"dest": "dist/bundle.html"
+}

@@ -1,3 +1,0 @@
-funtion demoMain() {
-	demo1();
-}
