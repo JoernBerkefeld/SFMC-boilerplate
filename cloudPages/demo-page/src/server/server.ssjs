@@ -1,0 +1,3 @@
+funtion demoMain() {
+	demo1();
+}

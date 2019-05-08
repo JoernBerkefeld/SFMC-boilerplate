@@ -1,0 +1,10 @@
+@charset "UTF-8";
+
+.warning {
+	display: none;
+}
+
+.test {
+	color: red;
+	background: transparent;
+}

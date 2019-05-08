@@ -1,0 +1,14 @@
+{
+	"name": "sfmc-blueprint",
+	"version": "1.0.0",
+	"description": "set up local dev env for Salesforce Marketing Cloud",
+	"main": "index.js",
+	"scripts": {
+		"build": "node build.js"
+	},
+	"author": "joern.berkefeld@gmail.com",
+	"license": "",
+	"dependencies": {
+		"find": "^0.3.0"
+	}
+}
