@@ -8,7 +8,14 @@
 	},
 	"author": "joern.berkefeld@gmail.com",
 	"license": "",
+	"bin": {
+		"build-cloudpages": "bin/build.js"
+	},
 	"dependencies": {
 		"find": "^0.3.0"
+	},
+	"devDependencies": {
+		"eslint": "^5.16.0",
+		"eslint-config-ssjs": "^1.0.4"
 	}
 }
