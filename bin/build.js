@@ -7,7 +7,7 @@ const find = require('find');
 let ssjsCoreLoaded = false;
 let error = false;
 let cloudPageCounter = 0;
-console.log('searching for \u001b[36mcloudpage.json\u001b[0m...');
+console.log('\nsearching for \u001b[36mcloudpage.json\u001b[0m...');
 const filesArr = find.fileSync('cloudpage.json', process.cwd());
 for (cloudPageCounter = 0; cloudPageCounter < filesArr.length; cloudPageCounter++) {
 	const filePath = filesArr[cloudPageCounter];
@@ -34,9 +34,9 @@ for (cloudPageCounter = 0; cloudPageCounter < filesArr.length; cloudPageCounter+
 	}
 }
 if (cloudPageCounter) {
-	console.log(`Found ${cloudPageCounter} cloudpages`);
+	console.log(`\nFound ${cloudPageCounter} cloudpages\n`);
 } else {
-	console.log('\u001b[31mNo cloudpages found\u001b[0m');
+	console.log('\u001b[31mNo cloudpages found\u001b[0m\n');
 }
 
 function returnSsjsWrap(content, config) {
