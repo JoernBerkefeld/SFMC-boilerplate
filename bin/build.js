@@ -78,7 +78,7 @@ function _returnWrapped(type, content, config) {
 
 function _filterComments(content) {
 	return content
-		.replace(/\/\*\*\s*\n([^\*]|(\*(?!\/)))*\*\//g, '') // remove jsdoc comments
+		.replace(/\/\*\*\s*\n([^*]|(\*(?!\/)))*\*\//g, '') // remove jsdoc comments
 		.replace(/\/\*.*\n?.*\*\//g, '') // remove multi-line comments
 		.replace(/([ \t\n])\/\/.*/g, '') // remove single-line comments
 		.replace(/^\/\/.*/g, '') // remove single-line comments at beginning of file
