@@ -4,6 +4,7 @@
 	"description": "set up local dev env for Salesforce Marketing Cloud",
 	"main": "index.js",
 	"scripts": {
+		"upgrade": "npm-check --update",
 		"eslint-check": "eslint --print-config . | eslint-config-prettier-check",
 		"build": "node build.js"
 	},
@@ -21,6 +22,7 @@
 		"eslint-config-prettier": "^4.2.0",
 		"eslint-config-ssjs": "^1.0.4",
 		"eslint-plugin-jsdoc": "^4.8.4",
+		"npm-check": "^5.9.0",
 		"prettier": "^1.17.1",
 		"prettier-eslint": "^8.8.2"
 	}
