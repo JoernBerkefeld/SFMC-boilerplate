@@ -1,16 +1,18 @@
 <script runat="server" executioncontexttype="post">
 
 /**** file: server/lib/lib.ab.ssjs ****/
-function demo1() { var i = 1 + 2; }
+ function demo1() { var i = 1 + 2; return i; }
 /******************/
 
 /**** file: server/lib/lib.cd.ssjs ****/
-function demo2(asd) { asd++; }
+ function demo2(asd) { asd++; return asd; }
 </script>
 
+<!-- *** file: server/lib/lib.something.html *** -->
+<div> <script runat="server"> function demo1() { } </script> </div>
 /**** file: server/server.ssjs ****/
 <script runat="server" executioncontexttype="post">
-function demoMain() { demo1(); }
+ function demoMain() { demo1(); }
 </script>
 
 <!-- *** file: public/index.html *** -->

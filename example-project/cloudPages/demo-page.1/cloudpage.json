@@ -6,7 +6,7 @@
 			"executioncontexttype": "post"
 		},
 		"dependencies": {
-			"other": ["servr/lib/lib.something.html"],
+			"other": ["server/lib/lib.something.html"],
 			"ssjs": ["server/lib/lib.ab.ssjs", "server/lib/lib.cd.ssjs"]
 		},
 		"src": ["server/server.ssjs"]
