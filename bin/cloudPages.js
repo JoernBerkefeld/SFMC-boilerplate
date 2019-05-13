@@ -5,6 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const find = require('find');
+const jsdoc2md = require('jsdoc-to-markdown');
 let ssjsCoreLoaded = false;
 let error = false;
 let cloudPageCounter = 0;
@@ -32,6 +33,8 @@ for (cloudPageCounter = 0; cloudPageCounter < filesArr.length; cloudPageCounter+
 	} else {
 		fs.writeFileSync(path.normalize(currentPath + '/' + config.dest), output);
 		console.log('\u001b[32mbundle updated successfully\u001b[0m');
+
+		createJsDocMarkdown(currentPath);
 	}
 }
 if (cloudPageCounter) {
@@ -85,6 +88,27 @@ function _filterComments(content) {
 		.replace(/<!--.*\n?.*-->/g, '') // filter HTML comments
 		.replace(/@charset .*;/g, '') // remove CSS file charset
 		.replace(/\s\s+/g, ' '); // remove double-spaces
+}
+function createJsDocMarkdown(currentPath) {
+	// JavaScript
+	_createJsDocMarkdown(currentPath, '/src/**/*.js', '/docs-js.md');
+
+	// Server-Side JavaScript
+	_createJsDocMarkdown(currentPath, '/src/**/*.ssjs', '/docs-ssjs.md');
+}
+function _createJsDocMarkdown(currentPath, src, dest) {
+	let output;
+	let relativeCurrentPath = currentPath.split(process.cwd()).pop();
+	if (relativeCurrentPath.charAt(0) === '/' || relativeCurrentPath.charAt(0) === '\\') {
+		relativeCurrentPath = relativeCurrentPath.substr(1);
+	}
+	try {
+		output = jsdoc2md.renderSync({ files: relativeCurrentPath + src, configure: 'bin/jsdoc-conf.json' });
+	} catch (e) {
+		console.log(`No Markdown created. ${src} not found`);
+		output = '';
+	}
+	fs.writeFileSync(path.normalize(relativeCurrentPath + dest), output);
 }
 function loadServer(config, currentPath) {
 	let output = '';

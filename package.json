@@ -6,12 +6,12 @@
 	"scripts": {
 		"upgrade": "npm-check --update",
 		"eslint-check": "eslint --print-config . | eslint-config-prettier-check",
-		"build": "node build.js"
+		"build": "build-cloudpages"
 	},
 	"author": "joern.berkefeld@gmail.com",
 	"license": "",
 	"bin": {
-		"build-cloudpages": "bin/build.js"
+		"build-cloudpages": "bin/cloudPages.js"
 	},
 	"dependencies": {
 		"find": "^0.3.0",
