@@ -5,3 +5,5 @@
 const complexCollection = require('./lib/lib.complexCollection');
 
 complexCollection('cloudpage.json');
+
+complexCollection('email.json');
