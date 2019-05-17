@@ -1,16 +1,24 @@
 # SFMC Boilerplate
 
-bundle your scripts for Cloudpages easily and automated
+bundle your scripts for Cloudpages & E-Mails easily and automated
+
+## Installation
+
+```
+$ npm install --save-dev sfmc-boilerplate
+```
 
 ## setup
 
-For now, no npm package (TODO). Instead, please copy files and settings into your project:
+it's all in its early stages for now. It offers these commands:
 
-- ``build.js`` --> copy to project root
-- ``package.json`` --> copy ``"build": "node build.js"`` line into your package.json. Place it into the ``"scripts: {...}`` section
-- go into the example folder ``cloudPages/demo-page`` and copy ``cloudpage.json``.
+- build-cloudpages
+- build-emails
+- build-all
 
-### cloudpage.json
+Run those in your terminal in the root of your project.
+
+### config files (email.json / cloudpage.json)
 
 The file is used to specify loading order and other details for compiling your code.
 
