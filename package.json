@@ -1,15 +1,35 @@
 {
 	"name": "sfmc-blueprint",
 	"version": "0.1.0",
-	"description": "set up local dev env for Salesforce Marketing Cloud",
-	"main": "index.js",
+	"description": "set up local dev env for Salesforce Marketing Cloud and create deployment bundles",
 	"scripts": {
 		"upgrade": "npm-check --update",
-		"eslint-check": "eslint --print-config . | eslint-config-prettier-check",
-		"build": "build-all"
+		"eslint-check": "eslint --print-config . | eslint-config-prettier-check"
 	},
 	"author": "joern.berkefeld@gmail.com",
-	"license": "",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/JoernBerkefeld/SFMC-boilerplate.git"
+	},
+	"bugs": {
+		"url": "https://github.com/JoernBerkefeld/SFMC-boilerplate/issues"
+	},
+	"homepage": "https://github.com/JoernBerkefeld/SFMC-boilerplate#readme",
+	"keywords": [
+		"ssjs",
+		"eslint",
+		"sfmc",
+		"linter",
+		"jshint",
+		"jslint",
+		"boilerplate",
+		"jsdoc",
+		"quality",
+		"minifiy",
+		"marketing-cloud",
+		"salesforce"
+	],
 	"bin": {
 		"build-cloudpages": "bin/cloudPages.js",
 		"build-emails": "bin/emails.js",
