@@ -1,5 +1,5 @@
 {
-	"name": "sfmc-blueprint",
+	"name": "sfmc-boilerplate",
 	"version": "0.1.0",
 	"description": "set up local dev env for Salesforce Marketing Cloud and create deployment bundles",
 	"scripts": {

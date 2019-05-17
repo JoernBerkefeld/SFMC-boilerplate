@@ -2,6 +2,9 @@
 
 bundle your scripts for Cloudpages & E-Mails easily and automated
 
+[![NPM](https://nodei.co/npm/sfmc-boilerplate.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/sfmc-boilerplate/)
+
+
 ## Installation
 
 ```
