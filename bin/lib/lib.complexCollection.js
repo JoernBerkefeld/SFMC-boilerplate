@@ -231,9 +231,9 @@ function complexCollection(configFileName) {
 						error = true;
 						return '';
 					}
-					const ext = f.split('.').pop();
+					// const ext = f.split('.').pop();
 					return (
-						_prefixFile(f, ext) +
+						_prefixFile(f, 'html') +
 						_returnWrapped(
 							ext,
 							_filterComments(
