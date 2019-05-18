@@ -23,7 +23,7 @@ This required file is used to specify loading order and other details for compil
 ```json
 {
 	"name": "name of your page or email",
-	"author": "joern.berkefeld@gmail.com",
+	"author": "joern.berkefeld@some-mail.com",
 	"server": {
 		"coreVersion": "1.1.1",
 		"scriptAttributes": {
