@@ -52,3 +52,8 @@ This required file is used to specify loading order and other details for compil
 | ``server.src``                | this is where your server-side app goes. You can use multipe files as well if needed                                              |
 | ``public``                    | list your front end files here; any type is supported. JS & CSS will be autowrapped in their own ``<script>`` / ``<style>`` nodes |
 | ``dest``                      | define the path and file name of your output file. The path is relative to the ``cloudpage.json``                                 |
+
+
+## License
+
+MIT licensed
