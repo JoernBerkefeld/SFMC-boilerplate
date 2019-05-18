@@ -4,7 +4,8 @@
 	"description": "set up local dev env for Salesforce Marketing Cloud and create deployment bundles",
 	"scripts": {
 		"upgrade": "npm-check --update",
-		"eslint-check": "eslint --print-config . | eslint-config-prettier-check"
+		"eslint-check": "eslint --print-config . | eslint-config-prettier-check",
+		"start": "node ./bin/index.js"
 	},
 	"author": "joern.berkefeld@gmail.com",
 	"license": "MIT",
@@ -31,13 +32,13 @@
 		"salesforce"
 	],
 	"bin": {
-		"build-cloudpages": "bin/cloudPages.js",
-		"build-emails": "bin/emails.js",
-		"build-all": "bin/all.js"
+		"sfmc-build": "./bin/index.js"
 	},
 	"dependencies": {
+		"cli-color": "^1.4.0",
 		"find": "^0.3.0",
-		"jsdoc-to-markdown": "^5.0.0"
+		"jsdoc-to-markdown": "^5.0.0",
+		"yargs": "^13.2.4"
 	},
 	"devDependencies": {
 		"eslint": "^5.16.0",
