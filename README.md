@@ -11,19 +11,14 @@ bundle your scripts for Cloudpages & E-Mails easily and automated
 $ npm install --save-dev sfmc-boilerplate
 ```
 
-## setup
+## Usage
 
-it's all in its early stages for now. It offers these commands:
+run ``sfmc-build`` in the root of your project to see all available commands.
 
-- build-cloudpages
-- build-emails
-- build-all
 
-Run those in your terminal in the root of your project.
+## Config files (email.json / cloudpage.json)
 
-### config files (email.json / cloudpage.json)
-
-The file is used to specify loading order and other details for compiling your code.
+This required file is used to specify loading order and other details for compiling your code. Place it inside of each folder where you keep the source files for one email or one cloudpage.
 
 ```json
 {
