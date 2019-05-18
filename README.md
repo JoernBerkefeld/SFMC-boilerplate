@@ -13,7 +13,7 @@ $ npm install --save-dev sfmc-boilerplate
 
 ## Usage
 
-run ``sfmc-build`` in the root of your project to see all available commands.
+run ``npx sfmc-build`` in the root of your project to see all available commands.
 
 
 ## Config files (email.json / cloudpage.json)
