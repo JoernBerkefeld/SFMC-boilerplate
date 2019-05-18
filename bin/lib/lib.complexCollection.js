@@ -180,7 +180,7 @@ function complexCollection(configFileType, nameFilter) {
 		try {
 			output = jsdoc2md.renderSync({
 				files: files,
-				configure: './bin/jsdoc-conf.json'
+				configure: path.resolve(__dirname, '../jsdoc-conf.json')
 			});
 			console.log(`- Markdown created. ${color.blackBright(files)}`);
 			fs.writeFileSync(path.normalize(relativeCurrentPath.substr(1) + dest), output);
