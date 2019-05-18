@@ -1,7 +1,7 @@
 ## Functions
 
 <dl>
-<dt><a href="#demo1">demo1()</a> ⇒ <code>Number</code></dt>
+<dt><a href="#demo1">demo1()</a> ⇒ <code>number</code></dt>
 <dd><p>demo method</p>
 </dd>
 <dt><a href="#demo2">demo2(asd)</a> ⇒ <code>Number</code></dt>
@@ -14,11 +14,11 @@
 
 <a name="demo1"></a>
 
-## demo1() ⇒ <code>Number</code>
+## demo1() ⇒ <code>number</code>
 demo method
 
 **Kind**: global function  
-**Returns**: <code>Number</code> - 3  
+**Returns**: <code>number</code> - e.g. 3  
 <a name="demo2"></a>
 
 ## demo2(asd) ⇒ <code>Number</code>

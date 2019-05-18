@@ -3,7 +3,7 @@
 /**
  * demo method
  *
- * @returns {Number} 3
+ * @returns {number} e.g. 3
  */
 function demo1() {
 	/*asdasd*/
