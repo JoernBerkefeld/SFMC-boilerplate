@@ -6,14 +6,27 @@ const fs = require('fs');
 const path = require('path');
 const find = require('find');
 const jsdoc2md = require('jsdoc-to-markdown');
+const color = require('cli-color');
 
 /**
  * does heavy lifting for emails and cloudpages
  *
- * @param {string} configFileName - name of the file that shall be searched for
+ * @param {string} configFileType - alias of the file that shall be searched for
+ * @param {string} [nameFilter] - allows to only update one specific object
  * @returns {undefined}
  */
-function complexCollection(configFileName) {
+function complexCollection(configFileType, nameFilter) {
+	let configFileName;
+	switch (configFileType) {
+		case 'cp':
+			configFileName = 'cloudpage.json';
+			break;
+		case 'e':
+			configFileName = 'email.json';
+			break;
+		default:
+			return;
+	}
 	let ssjsCoreLoaded = false;
 	let error = false;
 	let cloudPageCounter = 0;
@@ -26,9 +39,15 @@ function complexCollection(configFileName) {
 		// cloudPageCounter++;
 		const currentPath = path.dirname(filePath);
 		const config = require(filePath);
+		if (nameFilter && config.name !== nameFilter) {
+			console.error(
+				`Skipped '${filePath}' due to not meeting filter criteria: '${config.name}' != '${nameFilter}'`
+			);
+			continue;
+		}
 		const currentPage = currentPath.split(process.cwd()).pop();
 
-		console.log(`\n- ${currentPage}`);
+		console.log(`\n${cloudPageCounter + 1}) ${config.name} ${color.blackBright('- ' + currentPage)}`);
 		// create script wrapper
 		let output = '';
 
@@ -37,11 +56,13 @@ function complexCollection(configFileName) {
 
 		if (error) {
 			console.log(
-				`\u001b[31mBundle not updated\u001b[0m: Please fix the above errors and re-run for \u001b[33m${currentPage}\u001b[0m`
+				`${color.redBright('Bundle not updated')}: Please fix the above errors and re-run ${color.cyan(
+					`sfmc-build ${configFileType} "${config.name}"`
+				)}`
 			);
 		} else {
 			fs.writeFileSync(path.normalize(currentPath + '/' + config.dest), output);
-			console.log('\u001b[32mbundle updated successfully\u001b[0m');
+			console.log(color.greenBright('bundle updated successfully'));
 
 			createJsDocMarkdown(currentPath);
 		}
@@ -49,7 +70,7 @@ function complexCollection(configFileName) {
 	if (cloudPageCounter) {
 		console.log(`\nFound ${cloudPageCounter} ${configFileNamePlural}\n`);
 	} else {
-		console.log('\u001b[31mNo ' + configFileNamePlural + ' found\u001b[0m\n');
+		console.log(color.redBright('No ' + configFileNamePlural + ' found\n'));
 	}
 
 	/**
@@ -94,13 +115,13 @@ function complexCollection(configFileName) {
 	function _returnWrapped(type, content, config) {
 		switch (type) {
 			case 'css':
-				return `\n<style>\n${content}\n</style>\n`;
+				return `<style>\n${content}\n</style>\n`;
 			case 'js':
-				return `\n<script type="text/javascript">\n${content}\n</script>\n`;
+				return `<script type="text/javascript">\n${content}\n</script>\n`;
 			case 'ssjs':
 				return returnSsjsWrap(content, config);
 			default:
-				return `\n${content}\n`;
+				return `${content}\n`;
 		}
 	}
 
@@ -145,17 +166,28 @@ function complexCollection(configFileName) {
 	 */
 	function _createJsDocMarkdown(currentPath, src, dest) {
 		let output;
-		let relativeCurrentPath = currentPath.split(process.cwd()).pop();
-		if (relativeCurrentPath.charAt(0) === '/' || relativeCurrentPath.charAt(0) === '\\') {
-			relativeCurrentPath = relativeCurrentPath.substr(1);
-		}
+		// console.log('cwd', process.cwd());
+		const relativeCurrentPath = currentPath.split(process.cwd()).pop();
+		// if (relativeCurrentPath.charAt(0) === '/' || relativeCurrentPath.charAt(0) === '\\') {
+		// 	relativeCurrentPath = relativeCurrentPath.substr(1);
+		// }
+		const files = path
+			.normalize(relativeCurrentPath + src)
+			.split('\\')
+			.join('/')
+			.substr(1);
+
 		try {
-			output = jsdoc2md.renderSync({ files: relativeCurrentPath + src, configure: 'bin/jsdoc-conf.json' });
+			output = jsdoc2md.renderSync({
+				files: files,
+				configure: './bin/jsdoc-conf.json'
+			});
+			console.log(`- Markdown created. ${color.blackBright(files)}`);
+			fs.writeFileSync(path.normalize(relativeCurrentPath.substr(1) + dest), output);
 		} catch (e) {
-			console.log(`No Markdown created. ${src} not found`);
+			console.log(`${color.red('- No Markdown created')}. ${color.blackBright(files)} not found`);
 			output = '';
 		}
-		fs.writeFileSync(path.normalize(relativeCurrentPath + dest), output);
 	}
 
 	/**
@@ -166,7 +198,7 @@ function complexCollection(configFileName) {
 	 * @returns {string} minified file content
 	 */
 	function loadServer(config, currentPath) {
-		let output = '';
+		let output = '\n' + _prefixFile('SERVER', 'html', true);
 		const d = config.server.dependencies;
 		const src = config.server.src;
 
@@ -192,13 +224,13 @@ function complexCollection(configFileName) {
 						)
 					);
 				})
-				.join('\n\n');
+				.join('\n');
 			output += _returnWrapped('ssjs', ssjsLibCode, config);
 		}
 
 		// load other libs
 		if (d.other && d.other.length) {
-			output += d.other
+			const otherCode = d.other
 				.map(f => {
 					const thisPath = path.normalize(currentPath + '/src/' + f);
 					if (!fs.existsSync(thisPath)) {
@@ -219,6 +251,7 @@ function complexCollection(configFileName) {
 					);
 				})
 				.join('\n');
+			output += _returnWrapped('other', otherCode, config);
 		}
 
 		// load server
@@ -231,7 +264,7 @@ function complexCollection(configFileName) {
 						error = true;
 						return '';
 					}
-					// const ext = f.split('.').pop();
+					const ext = f.split('.').pop();
 					return (
 						_prefixFile(f, 'html') +
 						_returnWrapped(
@@ -259,7 +292,7 @@ function complexCollection(configFileName) {
 	 * @returns {string} minified file content
 	 */
 	function loadPublic(config, currentPath) {
-		let output = '';
+		let output = '\n' + _prefixFile('PUBLIC', 'html');
 		const pub = config.public;
 		if (pub && pub.length) {
 			output += pub
@@ -295,21 +328,23 @@ function complexCollection(configFileName) {
 	 *
 	 * @param {string} name - filename that was minified
 	 * @param {string} format - normalized file extension
+	 * @param {boolean} mainHeadline - switches off the "file: " prefix
 	 * @returns {string} file content plus a prefix
 	 */
-	function _prefixFile(name, format) {
+	function _prefixFile(name, format, mainHeadline) {
 		let output = '';
+		const prefix = mainHeadline ? '' : 'file: ';
 		switch (format) {
 			case 'html':
-				output += `<!-- *** file: ${name} *** -->`;
+				output += `<!-- *** ${prefix}${name} *** -->`;
 				break;
 			case 'css':
 			case 'js':
 			case 'ssjs':
-				output += `/**** file: ${name} ****/`;
+				output += `/**** ${prefix}${name} ****/`;
 				break;
 			case 'amp':
-				output += `%%[ /**** file: ${name} ****/ ]%%`;
+				output += `%%[ /**** ${prefix}${name} ****/ ]%%`;
 				break;
 			default:
 				output += '';
