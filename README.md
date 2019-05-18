@@ -22,6 +22,7 @@ This required file is used to specify loading order and other details for compil
 
 ```json
 {
+	"name": "name of your page or email",
 	"author": "joern.berkefeld@gmail.com",
 	"server": {
 		"coreVersion": "1.1.1",
@@ -41,6 +42,8 @@ This required file is used to specify loading order and other details for compil
 ``` 
 | Parameter                     | Description                                                                                                                       |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| ``name``                      | identifies how the page or email is called in SFMC                                                                                |
+| ``author``                    | name or email of author                                                                                                           |
 | ``server.coreVersion``        | this is used to insert "Platform.Load("core", "x.x.x");" before any SSJS code                                                     |
 | ``server.scriptAttributes``   | define any attributes you want to see on auto-inserted ``<script>`` tags for SSJS                                                 |
 | ``server.dependencies``       | put any re-usable libraries that you will not modifiy as part of the current app here                                             |
