@@ -61,6 +61,7 @@ function complexCollection(configFileType, nameFilter) {
 				)}`
 			);
 		} else {
+			output = _prefixBundle(config, currentPage) + output;
 			fs.writeFileSync(path.normalize(currentPath + '/' + config.dest), output);
 			console.log(color.greenBright('bundle updated successfully'));
 
@@ -350,6 +351,25 @@ function complexCollection(configFileType, nameFilter) {
 				output += '';
 		}
 		return '\n' + output + '\n';
+	}
+	/**
+	 * adds standard comments to the top of the bundle
+	 *
+	 * @param {Object} config - local config
+	 * @param {Object} currentPage - relative path
+	 * @returns {string} file comments
+	 */
+	function _prefixBundle(config, currentPage) {
+		let output = '%%[\n/*\n';
+		output += ` *  bundle created based on ${configFileName} for '${config.name}'\n`;
+		output += ` *  @author: ${config.author}\n`;
+		output += ` *  @created: ${new Date()
+			.toISOString()
+			.replace(/T/, ' ')
+			.replace(/\..+/, '')} GMT\n`;
+		output += ` *  @path: ${currentPage}\n`;
+
+		return output + ' */\n]%%';
 	}
 }
 

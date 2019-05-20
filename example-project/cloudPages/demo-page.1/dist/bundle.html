@@ -1,8 +1,17 @@
+%%[
+/*
+ *  bundle created based on cloudpage.json for 'undefined'
+ *  @author: joern.berkefeld@some-mail.com
+ *  @created: 2019-05-20 18:19:15 GMT
+ *  @path: \example-project\cloudPages\demo-page.1
+ */
+]%%
+
+<!-- *** SERVER *** -->
 <script runat="server" executioncontexttype="post">
 
 /**** file: server/lib/lib.ab.ssjs ****/
  function demo1() { var i = 1 + 2; return i; }
-
 
 /**** file: server/lib/lib.cd.ssjs ****/
  function demo2(asd) { asd++; return asd; }
@@ -10,25 +19,26 @@
 
 <!-- *** file: server/lib/lib.something.html *** -->
 <div> <script runat="server"> function demo1() { } </script> </div>
+
 <!-- *** file: server/server.ssjs *** -->
 <script runat="server" executioncontexttype="post">
  function demoMain() { demo1(); }
 </script>
 
-<!-- *** file: public/index.html *** -->
 
+<!-- *** file: PUBLIC *** -->
+
+<!-- *** file: public/index.html *** -->
 <div class="container"> <h1>my page</h1> </div>
 
 
 <!-- *** file: public/style.css *** -->
-
 <style>
  .warning { display: none; } .test { color: red; background: transparent; }
 </style>
 
 
 <!-- *** file: public/app.js *** -->
-
 <script type="text/javascript">
  if (top != self) { top.location = self.location; }
 </script>
