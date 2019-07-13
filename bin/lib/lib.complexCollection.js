@@ -28,50 +28,163 @@ function complexCollection(configFileType, nameFilter) {
 			return;
 	}
 	let ssjsCoreLoaded = false;
-	let error = false;
 	let cloudPageCounter = 0;
 	const configFileNamePlural = configFileName.split('.')[0] + 's';
 	console.log('\nsearching for \u001b[36m' + configFileName + '\u001b[0m...');
 	const filesArr = find.fileSync(configFileName, process.cwd());
+	if (filesArr.length) {
+		console.log(`Found ${filesArr.length} ${configFileNamePlural}:`);
+	} else {
+		console.log(color.redBright('No ' + configFileNamePlural + ' found\n'));
+	}
 	for (cloudPageCounter = 0; cloudPageCounter < filesArr.length; cloudPageCounter++) {
+		_processConfigFile(filesArr, cloudPageCounter);
+	}
+
+	/**
+	 * iterates over array and outputs all strings in that array via console.log()
+	 *
+	 * @param {Array<string>} logArr - log messages
+	 */
+	function _outputLogs(logArr) {
+		if ('object' !== typeof logArr) {
+			return;
+		}
+		for (let index = 0; index < logArr.length; index++) {
+			console.log(logArr[index]);
+		}
+	}
+	/**
+	 * make sure the config has the right attributes
+	 *
+	 * @param {Object} config - config loaded from file
+	 * @param {Array<string>} logs - list of logs for current item
+	 * @returns {boolean} - did the log pass the check or not
+	 */
+	function _sanityCheckConfig(config, logs) {
+		let testPassed = true;
+		if (!config.name) {
+			logs.push(color.redBright('Error') + ': config.name missing');
+			testPassed = false;
+		}
+		if (!config.author) {
+			logs.push(color.redBright('Error') + ': config.author missing');
+			testPassed = false;
+		}
+		if (!config.server || 'object' !== typeof config.server || 'undefined' !== typeof config.server.length) {
+			logs.push(color.redBright('Error') + ': config.server missing or not an object');
+			testPassed = false;
+		}
+		if ((!config.public || !config.public.length) && (!config.server.src || !config.server.src.length)) {
+			logs.push(
+				color.redBright('Error') +
+					': config.server.src and config.public missing. Make sure at least one has a link to a file.'
+			);
+			testPassed = false;
+		}
+		if (config.server.dependencies.ssjs && !config.server.coreVersion) {
+			logs.push(color.redBright('Error') + ': config.server.coreVersion missing. Set to "1.1.1" or similar.');
+			testPassed = false;
+		}
+
+		if (!config.dest) {
+			logs.push(color.redBright('Error') + ': config.dest missing. Set to "dist/bundle.html" or similar.');
+			testPassed = false;
+		}
+		return testPassed;
+	}
+	/**
+	 *
+	 *
+	 * @param {Array} filesArr - list of all files
+	 * @param {number} cloudPageCounter - iterator over all files
+	 * @returns {undefined}
+	 */
+	function _processConfigFile(filesArr, cloudPageCounter) {
+		const logs = [];
 		const filePath = filesArr[cloudPageCounter];
-		error = false;
+		// let error = false;
+		const finder = {
+			error: false,
+			jsFound: false, // eslint-disable-line prefer-const
+			ssjsFound: false // eslint-disable-line prefer-const
+		};
 		// cloudPageCounter++;
 		const currentPath = path.dirname(filePath);
 		const config = require(filePath);
 		if (nameFilter && config.name !== nameFilter) {
-			console.error(
-				`Skipped '${filePath}' due to not meeting filter criteria: '${config.name}' != '${nameFilter}'`
-			);
-			continue;
+			// console.error(
+			// 	`Skipped '${filePath}' due to not meeting filter criteria: '${config.name}' != '${nameFilter}'`
+			// );
+			return;
+		}
+		logs.push(`\n\u001b[36m${config.name}\u001b[0m ${color.blackBright('- ' + filePath)}`);
+		if (!_sanityCheckConfig(config, logs)) {
+			_outputLogs(logs);
+			return;
 		}
 		const currentPage = currentPath.split(process.cwd()).pop();
 
-		console.log(`\n${cloudPageCounter + 1}) ${config.name} ${color.blackBright('- ' + currentPage)}`);
 		// create script wrapper
 		let output = '';
 
-		output += loadServer(config, currentPath);
-		output += loadPublic(config, currentPath);
+		output += loadServer(config, currentPath, finder);
+		output += loadPublic(config, currentPath, finder);
 
-		if (error) {
-			console.log(
+		let serverConfigCode = null;
+		if (config.server.config && config.destConfig) {
+			serverConfigCode = loadServerConfig(config, currentPath);
+		} else if ((config.server.config && !config.destConfig) || (!config.server.config && config.destConfig)) {
+			logs.push(
+				`${color.redBright('Problem with server config')}: Please define ${color.cyan(
+					'config.server.config'
+				)} and ${color.cyan('config.destConfig')} together.`
+			);
+			finder.error = true;
+		}
+
+		if (finder.error) {
+			logs.push(
 				`${color.redBright('Bundle not updated')}: Please fix the above errors and re-run ${color.cyan(
 					`sfmc-build ${configFileType} "${config.name}"`
 				)}`
 			);
+			_outputLogs(logs);
 		} else {
 			output = _prefixBundle(config, currentPage) + output;
-			fs.writeFileSync(path.normalize(currentPath + '/' + config.dest), output);
-			console.log(color.greenBright('bundle updated successfully'));
+			const fileDest = path.normalize(currentPath + '/' + config.dest);
+			const directory = path.dirname(fileDest);
+			fs.mkdir(directory, { recursive: true }, err => {
+				if (!err) {
+					fs.readdir(directory, (err, files) => {
+						if (err) {
+							throw err;
+						}
 
-			createJsDocMarkdown(currentPath);
+						for (const file of files) {
+							fs.unlinkSync(path.join(directory, file));
+						}
+						fs.writeFile(fileDest, output, err => {
+							if (!err) {
+								if (serverConfigCode) {
+									fs.writeFileSync(
+										path.normalize(currentPath + '/' + config.destConfig),
+										serverConfigCode
+									);
+								}
+
+								logs.push(color.greenBright('bundle updated successfully'));
+
+								createJsDocMarkdown(currentPath, finder, logs);
+
+								_outputLogs(logs);
+							}
+						});
+					});
+				}
+			});
+			// fs.writeFileSync(), output);
 		}
-	}
-	if (cloudPageCounter) {
-		console.log(`\nFound ${cloudPageCounter} ${configFileNamePlural}\n`);
-	} else {
-		console.log(color.redBright('No ' + configFileNamePlural + ' found\n'));
 	}
 
 	/**
@@ -121,6 +234,8 @@ function complexCollection(configFileType, nameFilter) {
 				return `<script type="text/javascript">\n${content}\n</script>\n`;
 			case 'ssjs':
 				return returnSsjsWrap(content, config);
+			case 'amp':
+				return `<div style="display:none">\n${content}\n</style>\n`;
 			default:
 				return `${content}\n`;
 		}
@@ -147,14 +262,30 @@ function complexCollection(configFileType, nameFilter) {
 	 *
 	 *
 	 * @param {string} currentPath - current email/cloudpage folder
+	 * @param {Object} finder - status variable
+	 * @param {Array<string>} logs - multiple log messages for the same item
 	 * @returns {undefined}
 	 */
-	function createJsDocMarkdown(currentPath) {
-		// JavaScript
-		_createJsDocMarkdown(currentPath, '/src/**/*.js', '/docs-js.md');
+	function createJsDocMarkdown(currentPath, finder, logs) {
+		const jsDocDest = '/docs-js.md';
+		const ssjsDocDest = '/docs-ssjs.md';
+		const relativeCurrentPath = currentPath.split(process.cwd()).pop();
 
-		// Server-Side JavaScript
-		_createJsDocMarkdown(currentPath, '/src/**/*.ssjs', '/docs-ssjs.md');
+		if (finder.jsFound) {
+			// JavaScript
+			_createJsDocMarkdown(currentPath, '/src/**/*.js', jsDocDest, logs);
+			// cleanup
+		} else if (fs.existsSync(relativeCurrentPath.substr(1) + jsDocDest)) {
+			fs.unlinkSync(path.normalize(relativeCurrentPath.substr(1) + jsDocDest));
+		}
+
+		if (finder.ssjsFound) {
+			// Server-Side JavaScript
+			_createJsDocMarkdown(currentPath, '/src/**/*.ssjs', ssjsDocDest, logs);
+		} else if (fs.existsSync(relativeCurrentPath.substr(1) + ssjsDocDest)) {
+			// cleanup
+			fs.unlinkSync(path.normalize(relativeCurrentPath.substr(1) + ssjsDocDest));
+		}
 	}
 
 	/**
@@ -163,9 +294,10 @@ function complexCollection(configFileType, nameFilter) {
 	 * @param {string} currentPath - current email/cloudpage folder
 	 * @param {string} src - sub-path that needs to be searched
 	 * @param {string} dest - relative path of output MD
+	 * @param {Array<string>} logs - multiple log messages for the same item
 	 * @returns {undefined}
 	 */
-	function _createJsDocMarkdown(currentPath, src, dest) {
+	function _createJsDocMarkdown(currentPath, src, dest, logs) {
 		let output;
 		// console.log('cwd', process.cwd());
 		const relativeCurrentPath = currentPath.split(process.cwd()).pop();
@@ -183,10 +315,12 @@ function complexCollection(configFileType, nameFilter) {
 				files: files,
 				configure: path.resolve(__dirname, '../jsdoc-conf.json')
 			});
-			console.log(`- Markdown created. ${color.blackBright(files)}`);
+
+			logs.push(`- Markdown created for ${src.split('/').pop()} `);
+			// logs.push(`- Markdown created. ${color.blackBright(files)}`);
 			fs.writeFileSync(path.normalize(relativeCurrentPath.substr(1) + dest), output);
 		} catch (e) {
-			console.log(`${color.red('- No Markdown created')}. ${color.blackBright(files)} not found`);
+			logs.push(`${color.red('- No Markdown created')}. ${color.blackBright(files)} not found`);
 			output = '';
 		}
 	}
@@ -196,15 +330,17 @@ function complexCollection(configFileType, nameFilter) {
 	 *
 	 * @param {Object} config - local config
 	 * @param {string} currentPath - current email/cloudpage folder
+	 * @param {Object} finder - status variable
 	 * @returns {string} minified file content
 	 */
-	function loadServer(config, currentPath) {
+	function loadServer(config, currentPath, finder) {
 		let output = '\n' + _prefixFile('SERVER', 'html', true);
 		const d = config.server.dependencies;
 		const src = config.server.src;
 
 		// load SSJS libs
 		if (d.ssjs && d.ssjs.length) {
+			finder.ssjsFound = true;
 			const ssjsLibCode = d.ssjs
 				.map(f => {
 					const thisPath = path.normalize(currentPath + '/src/' + f);
@@ -212,7 +348,7 @@ function complexCollection(configFileType, nameFilter) {
 						console.log(
 							'\u001b[31mFile not found\u001b[0m (\u001b[33mserver.dependencies.ssjs\u001b[0m): ' + f
 						);
-						error = true;
+						finder.error = true;
 						return '';
 					}
 					return (
@@ -238,7 +374,7 @@ function complexCollection(configFileType, nameFilter) {
 						console.log(
 							'\u001b[31mFile not found\u001b[0m (\u001b[33mserver.dependencies.other\u001b[0m): ' + f
 						);
-						error = true;
+						finder.error = true;
 						return '';
 					}
 					return (
@@ -262,7 +398,7 @@ function complexCollection(configFileType, nameFilter) {
 					const thisPath = path.normalize(currentPath + '/src/' + f);
 					if (!fs.existsSync(thisPath)) {
 						console.log('\u001b[31mFile not found\u001b[0m (\u001b[33mserver.src\u001b[0m): ' + f);
-						error = true;
+						finder.error = true;
 						return '';
 					}
 					const ext = f.split('.').pop();
@@ -290,10 +426,41 @@ function complexCollection(configFileType, nameFilter) {
 	 *
 	 * @param {Object} config - local config
 	 * @param {string} currentPath - current email/cloudpage folder
+	 * @param {Object} finder - status variable
 	 * @returns {string} minified file content
 	 */
-	function loadPublic(config, currentPath) {
-		let output = '\n' + _prefixFile('PUBLIC', 'html');
+	function loadServerConfig(config, currentPath, finder) {
+		let output = '';
+		const serverConfig = config.server.config;
+
+		// load SSJS/ampscript config
+		if (serverConfig && serverConfig.length && typeof serverConfig === 'string') {
+			const ext = serverConfig.split('.').pop();
+
+			const thisPath = path.normalize(currentPath + '/src/' + serverConfig);
+			if (!fs.existsSync(thisPath)) {
+				console.log('\u001b[31mFile not found\u001b[0m (\u001b[33mserver.config\u001b[0m): ' + serverConfig);
+				finder.error = true;
+			}
+			const serverConfigCode = fs
+				.readFileSync(thisPath)
+				.toString()
+				.trim();
+			output = _returnWrapped(ext, serverConfigCode, config);
+		}
+
+		return output;
+	}
+	/**
+	 *
+	 *
+	 * @param {Object} config - local config
+	 * @param {string} currentPath - current email/cloudpage folder
+	 * @param {Object} finder - status variable
+	 * @returns {string} minified file content
+	 */
+	function loadPublic(config, currentPath, finder) {
+		let output = '\n' + _prefixFile('PUBLIC', 'html', true);
 		const pub = config.public;
 		if (pub && pub.length) {
 			output += pub
@@ -301,10 +468,15 @@ function complexCollection(configFileType, nameFilter) {
 					const thisPath = path.normalize(currentPath + '/src/' + f);
 					if (!fs.existsSync(thisPath)) {
 						console.log('\u001b[31mFile not found\u001b[0m (\u001b[33mpublic[]\u001b[0m): ' + f);
-						error = true;
+						finder.error = true;
 						return '';
 					}
 					const ext = f.split('.').pop();
+					if (ext === 'js') {
+						finder.jsFound = true;
+					} else if (ext === 'ssjs') {
+						finder.ssjsFound = true;
+					}
 					return (
 						_prefixFile(f, 'html') +
 						_returnWrapped(
