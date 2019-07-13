@@ -9,6 +9,7 @@
 			"other": ["server/lib/lib.something.html"],
 			"ssjs": ["server/lib/lib.ab.ssjs", "server/lib/lib.cd.ssjs"]
 		},
+		"config": null,
 		"src": ["server/server.ssjs"]
 	},
 	"public": ["public/index.html", "public/style.css", "public/app.js"],

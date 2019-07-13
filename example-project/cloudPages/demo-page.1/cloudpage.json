@@ -1,4 +1,5 @@
 {
+	"name": "demo1",
 	"author": "joern.berkefeld@some-mail.com",
 	"server": {
 		"coreVersion": "1.1.1",
@@ -11,6 +12,6 @@
 		},
 		"src": ["server/server.ssjs"]
 	},
-	"public": ["public/index.html", "public/style.css", "public/app.js"],
+	"public": ["public/index.html", "public/style.css"],
 	"dest": "dist/bundle.html"
 }

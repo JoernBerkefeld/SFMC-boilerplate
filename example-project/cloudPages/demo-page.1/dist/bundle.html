@@ -1,14 +1,15 @@
 %%[
 /*
- *  bundle created based on cloudpage.json for 'undefined'
+ *  bundle created based on cloudpage.json for 'demo1'
  *  @author: joern.berkefeld@some-mail.com
- *  @created: 2019-05-20 18:19:15 GMT
+ *  @created: 2019-07-13 11:28:38 GMT
  *  @path: \example-project\cloudPages\demo-page.1
  */
 ]%%
 
 <!-- *** SERVER *** -->
 <script runat="server" executioncontexttype="post">
+Platform.Load("core", "1.1.1");
 
 /**** file: server/lib/lib.ab.ssjs ****/
  function demo1() { var i = 1 + 2; return i; }
@@ -26,7 +27,7 @@
 </script>
 
 
-<!-- *** file: PUBLIC *** -->
+<!-- *** PUBLIC *** -->
 
 <!-- *** file: public/index.html *** -->
 <div class="container"> <h1>my page</h1> </div>
@@ -36,9 +37,3 @@
 <style>
  .warning { display: none; } .test { color: red; background: transparent; }
 </style>
-
-
-<!-- *** file: public/app.js *** -->
-<script type="text/javascript">
- if (top != self) { top.location = self.location; }
-</script>

@@ -1,0 +1,15 @@
+{
+	"name": "invalid config file",
+	"author": "",
+	"server": {
+		"coreVersion": "1.1.5",
+		"scriptAttributes": {},
+		"dependencies": {
+			"other": [],
+			"ssjs": []
+		},
+		"src": []
+	},
+	"public": [],
+	"dest": "dist/bundle.html"
+}
