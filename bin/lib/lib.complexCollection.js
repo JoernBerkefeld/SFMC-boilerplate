@@ -532,6 +532,8 @@ function complexCollection(configFileType, nameFilter) {
 	 * @returns {string} file comments
 	 */
 	function _prefixBundle(config, currentPage) {
+		const packageJson = require(path.normalize(process.cwd() + '/package.json'));
+
 		let output = '%%[\n/*\n';
 		output += ` *  bundle created based on ${configFileName} for '${config.name}'\n`;
 		output += ` *  @author: ${config.author}\n`;
@@ -539,6 +541,13 @@ function complexCollection(configFileType, nameFilter) {
 			.toISOString()
 			.replace(/T/, ' ')
 			.replace(/\..+/, '')} GMT\n`;
+		if (packageJson && packageJson.repository) {
+			if ('string' === typeof packageJson.repository) {
+				output += ` *  @repository: ${packageJson.repository}\n`;
+			} else if (packageJson.repository.url) {
+				output += ` *  @repository: ${packageJson.repository.url}\n`;
+			}
+		}
 		output += ` *  @path: ${currentPage}\n`;
 
 		return output + ' */\n]%%';
