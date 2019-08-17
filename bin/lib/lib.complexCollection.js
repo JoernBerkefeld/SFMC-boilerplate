@@ -198,7 +198,7 @@ function complexCollection(configFileType, nameFilter) {
 		let output = '<script runat="server"';
 		if (config.server.scriptAttributes) {
 			for (const el in config.server.scriptAttributes) {
-				if (config.server.scriptAttributes.hasOwnProperty(el)) {
+				if (Object.prototype.hasOwnProperty.call(config.server.scriptAttributes, el)) {
 					const value = config.server.scriptAttributes[el];
 					output += ` ${el}="${value}"`;
 				}
