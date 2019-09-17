@@ -253,7 +253,7 @@ function complexCollection(configFileType, nameFilter) {
 			.replace(/\/\*.*\n?.*\*\//g, '') // remove multi-line comments
 			.replace(/([ \t\n])\/\/.*/g, '') // remove single-line comments
 			.replace(/^\/\/.*/g, '') // remove single-line comments at beginning of file
-			.replace(/<!--.*\n?.*-->/g, '') // filter HTML comments
+			// .replace(/<!--.*\n?.*-->/g, '') // filter HTML comments
 			.replace(/@charset .*;/g, '') // remove CSS file charset
 			.replace(/\s\s+/g, ' '); // remove double-spaces
 	}
