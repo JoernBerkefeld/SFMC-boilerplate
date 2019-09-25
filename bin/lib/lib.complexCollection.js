@@ -388,13 +388,18 @@ function complexCollection(configFileType, nameFilter) {
 						finder.error = true;
 						return '';
 					}
+					const ext = f.split('.').pop();
 					return (
 						_prefixFile(f, 'html') +
+						_returnWrapped(
+							ext,
 						_filterComments(
 							fs
 								.readFileSync(path.normalize(currentPath + '/src/' + f))
 								.toString()
 								.trim()
+							),
+							config
 						)
 					);
 				})
@@ -413,6 +418,9 @@ function complexCollection(configFileType, nameFilter) {
 						return '';
 					}
 					const ext = f.split('.').pop();
+					if(ext === 'ssjs') {
+						finder.ssjsFound = true;
+					}
 					return (
 						_prefixFile(f, 'html') +
 						_returnWrapped(
