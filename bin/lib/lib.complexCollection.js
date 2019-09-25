@@ -60,7 +60,7 @@ function complexCollection(configFileType, nameFilter) {
 	/**
 	 * make sure the config has the right attributes
 	 *
-	 * @param {Object} config - config loaded from file
+	 * @param {object} config - config loaded from file
 	 * @param {Array<string>} logs - list of logs for current item
 	 * @returns {boolean} - did the log pass the check or not
 	 */
@@ -202,7 +202,7 @@ function complexCollection(configFileType, nameFilter) {
 	 *
 	 *
 	 * @param {string} content - code in file
-	 * @param {Object} config - local configuration
+	 * @param {object} config - local configuration
 	 * @returns {string} compiled code of file
 	 */
 	function _returnSsjsWrap(content, config) {
@@ -234,7 +234,7 @@ function complexCollection(configFileType, nameFilter) {
 	 *
 	 * @param {string} type - identifies the file extension
 	 * @param {string} content - code in file
-	 * @param {Object} config - local config
+	 * @param {object} config - local config
 	 * @returns {string} the wrapped code
 	 */
 	function _returnWrapped(type, content, config) {
@@ -273,7 +273,7 @@ function complexCollection(configFileType, nameFilter) {
 	 *
 	 *
 	 * @param {string} currentPath - current email/cloudpage folder
-	 * @param {Object} finder - status variable
+	 * @param {object} finder - status variable
 	 * @param {Array<string>} logs - multiple log messages for the same item
 	 * @returns {undefined}
 	 */
@@ -339,9 +339,9 @@ function complexCollection(configFileType, nameFilter) {
 	/**
 	 *
 	 *
-	 * @param {Object} config - local config
+	 * @param {object} config - local config
 	 * @param {string} currentPath - current email/cloudpage folder
-	 * @param {Object} finder - status variable
+	 * @param {object} finder - status variable
 	 * @returns {string} minified file content
 	 */
 	function loadServer(config, currentPath, finder) {
@@ -504,9 +504,9 @@ function complexCollection(configFileType, nameFilter) {
 	/**
 	 *
 	 *
-	 * @param {Object} config - local config
+	 * @param {object} config - local config
 	 * @param {string} currentPath - current email/cloudpage folder
-	 * @param {Object} finder - status variable
+	 * @param {object} finder - status variable
 	 * @returns {string} minified file content
 	 */
 	function loadServerConfig(config, currentPath, finder) {
@@ -534,9 +534,9 @@ function complexCollection(configFileType, nameFilter) {
 	/**
 	 *
 	 *
-	 * @param {Object} config - local config
+	 * @param {object} config - local config
 	 * @param {string} currentPath - current email/cloudpage folder
-	 * @param {Object} finder - status variable
+	 * @param {object} finder - status variable
 	 * @returns {string} minified file content
 	 */
 	function loadPublic(config, currentPath, finder) {
