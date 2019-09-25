@@ -205,7 +205,7 @@ function complexCollection(configFileType, nameFilter) {
 	 * @param {Object} config - local configuration
 	 * @returns {string} compiled code of file
 	 */
-	function returnSsjsWrap(content, config) {
+	function _returnSsjsWrap(content, config) {
 		let output = '<script runat="server"';
 		if (config.server.scriptAttributes) {
 			for (const el in config.server.scriptAttributes) {
@@ -244,7 +244,7 @@ function complexCollection(configFileType, nameFilter) {
 			case 'js':
 				return `<script type="text/javascript">\n${content}\n</script>\n`;
 			case 'ssjs':
-				return returnSsjsWrap(content, config);
+				return _returnSsjsWrap(content, config);
 			case 'amp':
 				return `<div style="display:none">\n${content}\n</div>\n`;
 			default:
