@@ -246,7 +246,7 @@ function complexCollection(configFileType, nameFilter) {
 			case 'ssjs':
 				return _returnSsjsWrap(content, config);
 			case 'amp':
-				return `<div style="display:none">\n${content}\n</div>\n`;
+					return `<div style="display:none">\n%%[\n${content}\n]%%\n</div>\n`;
 			default:
 				return `${content}\n`;
 		}
