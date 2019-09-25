@@ -18,6 +18,9 @@ const color = require('cli-color');
 function complexCollection(configFileType, nameFilter) {
 	let configFileName;
 	switch (configFileType) {
+		case 'lib':
+			configFileName = 'sfmc-lib.json';
+			break;
 		case 'cp':
 			configFileName = 'cloudpage.json';
 			break;
@@ -75,7 +78,7 @@ function complexCollection(configFileType, nameFilter) {
 			logs.push(color.redBright('Error') + ': config.server missing or not an object');
 			testPassed = false;
 		}
-		if ((!config.public || !config.public.length) && (!config.server.src || !config.server.src.length)) {
+		if ((!config.public || !config.public.length) && (!config.server.src || !config.server.src.length) && (!config.lib || ((!config.lib.ssjs || !config.lib.ssjs.length) && (!config.lib.amp || !config.lib.amp.length)))) {
 			logs.push(
 				color.redBright('Error') +
 					': config.server.src and config.public missing. Make sure at least one has a link to a file.'
@@ -107,7 +110,8 @@ function complexCollection(configFileType, nameFilter) {
 		const finder = {
 			error: false,
 			jsFound: false, // eslint-disable-line prefer-const
-			ssjsFound: false // eslint-disable-line prefer-const
+			ssjsFound: false, // eslint-disable-line prefer-const
+			libMode: 'amp'
 		};
 		// cloudPageCounter++;
 		const currentPath = path.dirname(filePath);
@@ -130,6 +134,13 @@ function complexCollection(configFileType, nameFilter) {
 
 		output += loadServer(config, currentPath, finder);
 		output += loadPublic(config, currentPath, finder);
+		const outputLib = loadlib(config, currentPath, finder);
+		if(outputLib) {
+			output += outputLib;
+		} else {
+			output += loadServer(config, currentPath, finder);
+			output += loadPublic(config, currentPath, finder);
+		}
 
 		let serverConfigCode = null;
 		if (config.server.config && config.destConfig) {
@@ -151,7 +162,7 @@ function complexCollection(configFileType, nameFilter) {
 			);
 			_outputLogs(logs);
 		} else {
-			output = _prefixBundle(config, currentPage) + output;
+			output = _prefixBundle(config, currentPage, finder.libMode) + output;
 			const fileDest = path.normalize(currentPath + '/' + config.dest);
 			const directory = path.dirname(fileDest);
 			fs.mkdir(directory, { recursive: true }, err => {
@@ -420,7 +431,76 @@ function complexCollection(configFileType, nameFilter) {
 		}
 		return output;
 	}
+	/**
+	 * if the system is used solely for minification of a library, this method can be used
+	 *
+	 * @param {object} config - local config
+	 * @param {string} currentPath - current email/cloudpage folder
+	 * @param {object} finder - status variable
+	 * @returns {string} minified file content
+	 */
+	function loadlib(config, currentPath, finder) {
+		let output = '';
+		if(!config.lib) {
+			return output;
+		}
+		const myLib = config.lib;
 
+		// load SSJS libs
+		if (myLib.ssjs && myLib.ssjs.length) {
+			finder.ssjsFound = true;
+			const ssjsLibCode = myLib.ssjs
+				.map(f => {
+					const thisPath = path.normalize(currentPath + '/src/' + f);
+					if (!fs.existsSync(thisPath)) {
+						console.log(
+							'\u001b[31mFile not found\u001b[0m (\u001b[33mserver.dependencies.ssjs\u001b[0m): ' + f
+						);
+						finder.error = true;
+						return '';
+					}
+					return (
+						_filterComments(
+							fs
+								.readFileSync(thisPath)
+								.toString()
+								.trim()
+						)
+					);
+				})
+				.join('\n');
+			output += ssjsLibCode;
+			finder.libMode = 'ssjs';
+		}
+
+		// load other libs
+		else if (myLib.amp && myLib.amp.length) {
+			const ampCode = myLib.amp
+				.map(f => {
+					const thisPath = path.normalize(currentPath + '/src/' + f);
+					if (!fs.existsSync(thisPath)) {
+						console.log(
+							'\u001b[31mFile not found\u001b[0m (\u001b[33mserver.dependencies.other\u001b[0m): ' + f
+						);
+						finder.error = true;
+						return '';
+					}
+					return (
+						_filterComments(
+							fs
+								.readFileSync(path.normalize(currentPath + '/src/' + f))
+								.toString()
+								.trim()
+						)
+					);
+				})
+				.join('\n');
+			output += ampCode;
+			finder.libMode = 'amp';
+		}
+
+		return output;
+	}
 	/**
 	 *
 	 *
@@ -460,9 +540,10 @@ function complexCollection(configFileType, nameFilter) {
 	 * @returns {string} minified file content
 	 */
 	function loadPublic(config, currentPath, finder) {
-		let output = '\n' + _prefixFile('PUBLIC', 'html', true);
+		let output = '';
 		const pub = config.public;
 		if (pub && pub.length) {
+			output = '\n' + _prefixFile('PUBLIC', 'html', true);
 			output += pub
 				.map(f => {
 					const thisPath = path.normalize(currentPath + '/src/' + f);
@@ -527,14 +608,21 @@ function complexCollection(configFileType, nameFilter) {
 	/**
 	 * adds standard comments to the top of the bundle
 	 *
-	 * @param {Object} config - local config
-	 * @param {Object} currentPage - relative path
+	 * @param {object} config - local config
+	 * @param {object} currentPage - relative path
+	 * @param {string} [libMode] - switches surrounding ampscript signs off if code shall be used in lib
 	 * @returns {string} file comments
 	 */
-	function _prefixBundle(config, currentPage) {
+	function _prefixBundle(config, currentPage, libMode) {
 		const packageJson = require(path.normalize(process.cwd() + '/package.json'));
-
-		let output = '%%[\n/*\n';
+		if(!libMode) {
+			libMode='amp';
+		}
+		let output = '';
+		if(libMode !== 'amp') {
+			output = '%%[\n';
+		}
+		output += '/*\n';
 		output += ` *  bundle created based on ${configFileName} for '${config.name}'\n`;
 		output += ` *  @author: ${config.author}\n`;
 		output += ` *  @created: ${new Date()
@@ -548,9 +636,11 @@ function complexCollection(configFileType, nameFilter) {
 				output += ` *  @repository: ${packageJson.repository.url}\n`;
 			}
 		}
-		output += ` *  @path: ${currentPage}\n`;
-
-		return output + ' */\n]%%';
+		output += ` *  @path: ${currentPage}\n */\n`;
+		if(libMode !== 'amp') {
+			output += ']%%\n';
+		}
+		return output;
 	}
 }
 

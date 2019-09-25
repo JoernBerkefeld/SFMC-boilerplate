@@ -19,6 +19,20 @@ yargs
 		}
 	})
 	.command({
+		command: 'library [name]',
+		aliases: ['lib'],
+		desc: 'compiles all or the given library',
+		builder: yargs => {
+			yargs.positional('name', {
+				type: 'string',
+				describe: 'the name of the library to parse'
+			});
+		},
+		handler: argv => {
+			complexCollection('lib', argv.name);
+		}
+	})
+	.command({
 		command: 'cloudPages [name]',
 		aliases: ['cp'],
 		desc: 'compiles all or the given cloudpage',
