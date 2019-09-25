@@ -131,9 +131,7 @@ function complexCollection(configFileType, nameFilter) {
 
 		// create script wrapper
 		let output = '';
-
-		output += loadServer(config, currentPath, finder);
-		output += loadPublic(config, currentPath, finder);
+		
 		const outputLib = loadlib(config, currentPath, finder);
 		if(outputLib) {
 			output += outputLib;
@@ -345,10 +343,14 @@ function complexCollection(configFileType, nameFilter) {
 	 * @returns {string} minified file content
 	 */
 	function loadServer(config, currentPath, finder) {
-		let output = '\n' + _prefixFile('SERVER', 'html', true);
 		const d = config.server.dependencies;
 		const src = config.server.src;
-
+		let output = '';
+		
+		if ((d.ssjs && d.ssjs.length) || (d.other && d.other.length) || (src && src.length)) {
+			output = '\n' + _prefixFile('SERVER', 'html', true);
+		}
+		
 		// load SSJS libs
 		if (d.ssjs && d.ssjs.length) {
 			finder.ssjsFound = true;
@@ -393,11 +395,11 @@ function complexCollection(configFileType, nameFilter) {
 						_prefixFile(f, 'html') +
 						_returnWrapped(
 							ext,
-						_filterComments(
-							fs
-								.readFileSync(path.normalize(currentPath + '/src/' + f))
-								.toString()
-								.trim()
+							_filterComments(
+								fs
+									.readFileSync(path.normalize(currentPath + '/src/' + f))
+									.toString()
+									.trim()
 							),
 							config
 						)
