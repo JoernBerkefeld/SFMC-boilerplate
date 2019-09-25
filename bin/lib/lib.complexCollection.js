@@ -629,7 +629,7 @@ function complexCollection(configFileType, nameFilter) {
 			libMode='amp';
 		}
 		let output = '';
-		if(libMode !== 'amp') {
+		if(libMode === 'amp') {
 			output = '%%[\n';
 		}
 		output += '/*\n';
@@ -647,7 +647,7 @@ function complexCollection(configFileType, nameFilter) {
 			}
 		}
 		output += ` *  @path: ${currentPage}\n */\n`;
-		if(libMode !== 'amp') {
+		if(libMode === 'amp') {
 			output += ']%%\n';
 		}
 		return output;
