@@ -243,14 +243,11 @@ function complexCollection(configFileType, nameFilter, templateName) {
                     'Template not found'
                 )}: The template ${templateName} is not defined`
             );
-            logs.push(config);
         } else {
             logs.push(`${color.greenBright('Applied template')}: '${templateName}'`);
-            logs.push(config.template[templateName]);
 
             for (const search in config.template[templateName]) {
                 const replacement = config.template[templateName][search];
-                logs.push(`- ${search}: ${replacement}`);
                 code = code.split(search).join(replacement);
             }
         }

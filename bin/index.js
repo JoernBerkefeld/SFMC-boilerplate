@@ -57,8 +57,6 @@ yargs
             });
         },
         handler: argv => {
-            console.log("cp");
-            console.log(argv);
             complexCollection('cp', argv.name, argv.template);
         }
     })
