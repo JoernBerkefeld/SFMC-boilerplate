@@ -188,7 +188,6 @@ function complexCollection(configFileType, nameFilter, templateName) {
             const directory = path.dirname(fileDest);
             fs.mkdir(directory, { recursive: true }, err => {
                 if (!err) {
-
                     if (templateName) {
                         output = _templatingCode(config, templateName, output);
                         fileDest = _templatingName(config, templateName, fileDest);
@@ -691,7 +690,7 @@ function complexCollection(configFileType, nameFilter, templateName) {
      */
     function _prefixFile(name, format, mainHeadline) {
         let output = '';
-        const prefix = mainHeadline ? '' : 'file: ';
+        const prefix = mainHeadline ? '' : 'file: src/';
         switch (format) {
             case 'html':
                 output += `<!-- *** ${prefix}${name} *** -->`;
@@ -742,7 +741,7 @@ function complexCollection(configFileType, nameFilter, templateName) {
                 output += ` *  @repository: ${packageJson.repository.url}\n`;
             }
         }
-        output += ` *  @path: ${currentPage}\n */\n`;
+        output += ` *  @path: ${currentPage.split('\\').join('/')}\n */\n`;
         if (libMode === 'amp') {
             output += ']%%\n';
         }
