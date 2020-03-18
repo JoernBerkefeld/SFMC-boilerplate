@@ -188,44 +188,49 @@ function complexCollection(configFileType, nameFilter, templateName) {
             const directory = path.dirname(fileDest);
             fs.mkdir(directory, { recursive: true }, err => {
                 if (!err) {
-                    fs.readdir(directory, (err, files) => {
-                        if (err) {
-                            throw err;
-                        }
 
-                        for (const file of files) {
-                            fs.unlinkSync(path.join(directory, file));
-                        }
-                        if (templateName) {
-                            output = _templatingCode(config, templateName, output);
-                            fileDest = _templatingName(config, templateName, fileDest);
-                        }
+                    if (templateName) {
+                        output = _templatingCode(config, templateName, output);
+                        fileDest = _templatingName(config, templateName, fileDest);
+                    }
 
-                        fs.writeFile(fileDest, output, err => {
-                            if (!err) {
-                                if (serverConfigCode) {
-                                    let destinationPath = config.destConfig;
-                                    if (templateName) {
-                                        serverConfigCode = _templatingCode(config, templateName, serverConfigCode);
-                                        destinationPath = _templatingName(config, templateName, destinationPath);
-                                    }
-                                    fs.writeFileSync(
-                                        path.normalize(currentPath + '/' + destinationPath),
+                    if (fs.existsSync(fileDest)) {
+                        fs.unlinkSync(fileDest);
+                    }
+                    fs.writeFile(fileDest, output, err => {
+                        if (!err) {
+                            if (serverConfigCode) {
+                                let destinationPath = config.destConfig;
+                                if (templateName) {
+                                    serverConfigCode = _templatingCode(
+                                        config,
+                                        templateName,
                                         serverConfigCode
                                     );
+                                    destinationPath = _templatingName(
+                                        config,
+                                        templateName,
+                                        destinationPath
+                                    );
                                 }
-
-                                logs.push(color.greenBright('bundle updated successfully'));
-
-                                createJsDocMarkdown(currentPath, finder, logs);
-
-                                _outputLogs(logs);
+                                const configDest = path.normalize(
+                                    currentPath + '/' + destinationPath
+                                );
+                                if (fs.existsSync(configDest)) {
+                                    fs.unlinkSync(configDest);
+                                }
+                                fs.writeFileSync(configDest, serverConfigCode);
                             }
-                        });
+
+                            logs.push(color.greenBright('bundle updated successfully'));
+
+                            createJsDocMarkdown(currentPath, finder, logs);
+
+                            _outputLogs(logs);
+                        }
                     });
                 }
             });
-            // fs.writeFileSync(), output);
         }
     }
     /**
@@ -271,7 +276,7 @@ function complexCollection(configFileType, nameFilter, templateName) {
             const destinationExt = destinationParts.pop();
             return destinationParts.join('.') + `-${templateName}.${destinationExt}`;
         }
-}
+    }
 
     /**
      *
