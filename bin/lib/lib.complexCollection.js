@@ -183,7 +183,7 @@ function complexCollection(configFileType, nameFilter, templateName) {
             );
             _outputLogs(logs);
         } else {
-            output = _prefixBundle(config, currentPage, finder.libMode) + output;
+            output = _prefixBundle(config, currentPage, finder.libMode, templateName) + output;
             let fileDest = path.normalize(currentPath + '/' + config.dest);
             const directory = path.dirname(fileDest);
             fs.mkdir(directory, { recursive: true }, err => {
@@ -710,9 +710,10 @@ function complexCollection(configFileType, nameFilter, templateName) {
      * @param {object} config - local config
      * @param {object} currentPage - relative path
      * @param {string} [libMode] - switches surrounding ampscript signs off if code shall be used in lib
+     * @param {string} [templateName] - name of template
      * @returns {string} file comments
      */
-    function _prefixBundle(config, currentPage, libMode) {
+    function _prefixBundle(config, currentPage, libMode, templateName) {
         const packageJson = require(path.normalize(process.cwd() + '/package.json'));
         if (!libMode) {
             libMode = 'amp';
@@ -723,6 +724,7 @@ function complexCollection(configFileType, nameFilter, templateName) {
         }
         output += '/*\n';
         output += ` *  bundle created based on ${configFileName} for '${config.name}'\n`;
+        output += ` *  template: ${templateName ? templateName : 'n/a'}\n`;
         output += ` *  @author: ${config.author}\n`;
         output += ` *  @created: ${new Date()
             .toISOString()
