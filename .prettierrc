@@ -1,0 +1,15 @@
+{
+    "tabWidth": 4,
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "parser": "babel",
+    "overrides": [
+        {
+            "files": "*.json",
+            "options": {
+                "parser": "json"
+            }
+        }
+    ]
+}
