@@ -4,17 +4,15 @@ bundle your scripts for Cloudpages & E-Mails easily and automated
 
 [![NPM](https://nodei.co/npm/sfmc-boilerplate.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/sfmc-boilerplate/)
 
-
 ## Installation
 
-```
-$ npm install --save-dev sfmc-boilerplate
+```batch
+> npm install --save-dev sfmc-boilerplate
 ```
 
 ## Usage
 
 run ``npx sfmc-build`` in the root of your project to see all available commands.
-
 
 ## Config files (email.json / cloudpage.json)
 
@@ -22,24 +20,34 @@ This required file is used to specify loading order and other details for compil
 
 ```json
 {
-	"name": "name of your page or email",
-	"author": "joern.berkefeld@some-mail.com",
-	"server": {
-		"coreVersion": "1.1.1",
-		"scriptAttributes": {
-			"executioncontexttype": "post"
-		},
-		"dependencies": {
-			"other": ["server/lib/lib.something.html"],
-			"ssjs": ["server/lib/lib.ab.ssjs", "server/lib/lib.cd.ssjs"]
-		},
-		"src": ["server/server.ssjs"]
-	},
-	"public": ["public/index.html", "public/style.css", "public/app.js"],
-	"dest": "dist/bundle.html"
+    "name": "name of your page or email",
+    "author": "joern.berkefeld@some-mail.com",
+    "server": {
+        "coreVersion": "1.1.1",
+        "scriptAttributes": {
+            "executioncontexttype": "post"
+        },
+        "dependencies": {
+            "other": ["server/lib/lib.something.html"],
+            "ssjs": ["server/lib/lib.ab.ssjs", "server/lib/lib.cd.ssjs"]
+        },
+        "src": ["server/server.ssjs"]
+    },
+    "public": ["public/index.html", "public/style.css", "public/app.js"],
+    "dest": "dist/bundle.html",
+    "template": {
+        "DEV":{
+        },
+        "QA": {
+            "_DEV": "_QA"
+        },
+        "PROD": {
+            "_DEV": ""
+        }
+    }
 }
+```
 
-``` 
 | Parameter                     | Description                                                                                                                       |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | ``name``                      | identifies how the page or email is called in SFMC                                                                                |
@@ -52,7 +60,7 @@ This required file is used to specify loading order and other details for compil
 | ``server.src``                | this is where your server-side app goes. You can use multipe files as well if needed                                              |
 | ``public``                    | list your front end files here; any type is supported. JS & CSS will be autowrapped in their own ``<script>`` / ``<style>`` nodes |
 | ``dest``                      | define the path and file name of your output file. The path is relative to the ``cloudpage.json``                                 |
-
+| ``template``                  | allows you to do string replacements and will output dedicated bundles per template                                               |
 
 ## License
 

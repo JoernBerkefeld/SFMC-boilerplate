@@ -7,61 +7,81 @@ const yargs = require('yargs');
 
 // CLI framework
 yargs
-	.scriptName('sfmc-build')
-	.usage('Usage: $0 <command> [options]')
-	.command({
-		command: 'all',
-		aliases: ['a'],
-		desc: 'processes all file types',
-		handler: () => {
-			complexCollection('cp');
-			complexCollection('e');
-		}
-	})
-	.command({
-		command: 'library [name]',
-		aliases: ['lib'],
-		desc: 'compiles all or the given library',
-		builder: yargs => {
-			yargs.positional('name', {
-				type: 'string',
-				describe: 'the name of the library to parse'
-			});
-		},
-		handler: argv => {
-			complexCollection('lib', argv.name);
-		}
-	})
-	.command({
-		command: 'cloudPages [name]',
-		aliases: ['cp'],
-		desc: 'compiles all or the given cloudpage',
-		builder: yargs => {
-			yargs.positional('name', {
-				type: 'string',
-				describe: 'the name of the cloudpage to parse'
-			});
-		},
-		handler: argv => {
-			complexCollection('cp', argv.name);
-		}
-	})
-	.command({
-		command: 'emails [name]',
-		aliases: ['e'],
-		desc: 'compiles all or the given email',
-		builder: yargs => {
-			yargs.positional('name', {
-				type: 'string',
-				describe: 'the name of the email to parse'
-			});
-		},
-		handler: argv => {
-			complexCollection('e', argv.name);
-		}
-	})
-	.demandCommand(1, 'Please enter a valid command')
-	.strict()
-	.recommendCommands()
-	.wrap(yargs.terminalWidth())
-	.help().argv;
+    .scriptName('sfmc-build')
+    .usage('Usage: $0 <command> [options]')
+    .command({
+        command: 'all [template]',
+        aliases: ['a'],
+        desc: 'processes all file types',
+        builder: yargs => {
+            yargs.positional('template', {
+                type: 'string',
+                describe: 'the name of the template to convert environment specific values'
+            });
+        },
+        handler: argv => {
+            complexCollection('cp', null, argv.template);
+            complexCollection('e', null, argv.template);
+        }
+    })
+    .command({
+        command: 'library [name] [template]',
+        aliases: ['lib'],
+        desc: 'compiles all or the given library',
+        builder: yargs => {
+            yargs.positional('name', {
+                type: 'string',
+                describe: 'the name of the library to parse'
+            })
+            .positional('template', {
+                type: 'string',
+                describe: 'the name of the template to convert environment specific values'
+            });
+        },
+        handler: argv => {
+            complexCollection('lib', argv.name, argv.template);
+        }
+    })
+    .command({
+        command: 'cloudPages [name] [template]',
+        aliases: ['cp'],
+        desc: 'compiles all or the given cloudpage',
+        builder: yargs => {
+            yargs.positional('name', {
+                type: 'string',
+                describe: 'the name of the cloudpage to parse'
+            })
+            .positional('template', {
+                type: 'string',
+                describe: 'the name of the template to convert environment specific values'
+            });
+        },
+        handler: argv => {
+            console.log("cp");
+            console.log(argv);
+            complexCollection('cp', argv.name, argv.template);
+        }
+    })
+    .command({
+        command: 'emails [name] [template]',
+        aliases: ['e'],
+        desc: 'compiles all or the given email',
+        builder: yargs => {
+            yargs.positional('name', {
+                type: 'string',
+                describe: 'the name of the email to parse'
+            })
+            .positional('template', {
+                type: 'string',
+                describe: 'the name of the template to convert environment specific values'
+            });
+        },
+        handler: argv => {
+            complexCollection('e', argv.name, argv.template);
+        }
+    })
+    .demandCommand(1, 'Please enter a valid command')
+    .strict()
+    .recommendCommands()
+    .wrap(yargs.terminalWidth())
+    .help().argv;
