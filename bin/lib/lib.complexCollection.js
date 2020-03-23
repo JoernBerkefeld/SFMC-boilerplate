@@ -45,6 +45,10 @@ function complexCollection(configFileType, nameFilter, templateName) {
         _processConfigFile(filesArr, cloudPageCounter, templateName);
     }
 
+    // *********************************************/
+    // *********************************************/
+    // *********************************************/
+
     /**
      * iterates over array and outputs all strings in that array via console.log()
      *
@@ -140,96 +144,128 @@ function complexCollection(configFileType, nameFilter, templateName) {
             // );
             return;
         }
-        logs.push(`\n\u001b[36m${config.name}\u001b[0m ${color.blackBright('- ' + filePath)}`);
         if (!_sanityCheckConfig(config, logs)) {
+            logs.push(
+                `\n\u001b[36m${config.name}\u001b[0m ${
+                    templateName ? ' (' + templateName + ')' : ''
+                } ${color.blackBright('- ' + filePath)}`
+            );
             _outputLogs(logs);
             return;
         }
         const currentPage = currentPath.split(process.cwd()).pop();
 
-        // create script wrapper
-        let output = '';
-
-        const outputLib = loadlib(config, currentPath, finder);
-        if (outputLib) {
-            output += outputLib;
-        } else {
-            output += loadServer(config, currentPath, finder);
-            output += loadPublic(config, currentPath, finder);
-        }
-
-        let serverConfigCode = null;
-        if (config.server.config && config.destConfig) {
-            serverConfigCode = loadServerConfig(config, currentPath);
-        } else if (
-            (config.server.config && !config.destConfig) ||
-            (!config.server.config && config.destConfig)
-        ) {
-            logs.push(
-                `${color.redBright('Problem with server config')}: Please define ${color.cyan(
-                    'config.server.config'
-                )} and ${color.cyan('config.destConfig')} together.`
-            );
-            finder.error = true;
-        }
-
-        if (finder.error) {
-            logs.push(
-                `${color.redBright(
-                    'Bundle not updated'
-                )}: Please fix the above errors and re-run ${color.cyan(
-                    `sfmc-build ${configFileType} "${config.name}"`
-                )}`
-            );
-            _outputLogs(logs);
-        } else {
-            output = _prefixBundle(config, currentPage, finder.libMode, templateName) + output;
-            let fileDest = path.normalize(currentPath + '/' + config.dest);
-            const directory = path.dirname(fileDest);
-            fs.mkdir(directory, { recursive: true }, err => {
-                if (!err) {
-                    if (templateName) {
-                        output = _templatingCode(config, templateName, output);
-                        fileDest = _templatingName(config, templateName, fileDest);
+        const templateList = [];
+        if (templateName) {
+            if (templateName === '*') {
+                if (config.template) {
+                    for (const key in config.template) {
+                        templateList.push(key);
                     }
-
-                    if (fs.existsSync(fileDest)) {
-                        fs.unlinkSync(fileDest);
-                    }
-                    fs.writeFile(fileDest, output, err => {
-                        if (!err) {
-                            if (serverConfigCode) {
-                                let destinationPath = config.destConfig;
-                                if (templateName) {
-                                    serverConfigCode = _templatingCode(
-                                        config,
-                                        templateName,
-                                        serverConfigCode
-                                    );
-                                    destinationPath = _templatingName(
-                                        config,
-                                        templateName,
-                                        destinationPath
-                                    );
-                                }
-                                const configDest = path.normalize(
-                                    currentPath + '/' + destinationPath
-                                );
-                                if (fs.existsSync(configDest)) {
-                                    fs.unlinkSync(configDest);
-                                }
-                                fs.writeFileSync(configDest, serverConfigCode);
-                            }
-
-                            logs.push(color.greenBright('bundle updated successfully'));
-
-                            createJsDocMarkdown(currentPath, finder, logs);
-
-                            _outputLogs(logs);
-                        }
-                    });
                 }
-            });
+            } else {
+                templateList.push(templateName);
+            }
+        }
+        if (!templateList.length) {
+            // fallback
+            templateList.push(null);
+        }
+        for (let myTemplateName of templateList) {
+            // create script wrapper
+            let output = '';
+            const logs = [];
+            if (!config.template || !config.template[myTemplateName]) {
+                myTemplateName = null;
+            }
+            logs.push(
+                `\n\u001b[36m${config.name}\u001b[0m ${
+                    myTemplateName ? ' (' + myTemplateName + ')' : ''
+                } ${color.blackBright('- ' + filePath)}`
+            );
+
+            const outputLib = loadlib(config, currentPath, finder);
+            if (outputLib) {
+                output += outputLib;
+            } else {
+                output += loadServer(config, currentPath, finder);
+                output += loadPublic(config, currentPath, finder);
+            }
+
+            let serverConfigCode = null;
+            if (config.server.config && config.destConfig) {
+                serverConfigCode = loadServerConfig(config, currentPath);
+            } else if (
+                (config.server.config && !config.destConfig) ||
+                (!config.server.config && config.destConfig)
+            ) {
+                logs.push(
+                    `${color.redBright('Problem with server config')}: Please define ${color.cyan(
+                        'config.server.config'
+                    )} and ${color.cyan('config.destConfig')} together.`
+                );
+                finder.error = true;
+            }
+
+            if (finder.error) {
+                logs.push(
+                    `${color.redBright(
+                        'Bundle not updated'
+                    )}: Please fix the above errors and re-run ${color.cyan(
+                        `sfmc-build ${configFileType} "${config.name}"`
+                    )}`
+                );
+                _outputLogs(logs);
+            } else {
+                output =
+                    _prefixBundle(config, currentPage, finder.libMode, myTemplateName) + output;
+                let fileDest = path.normalize(currentPath + '/' + config.dest);
+                const directory = path.dirname(fileDest);
+                fs.mkdir(directory, { recursive: true }, err => {
+                    if (!err) {
+                        if (myTemplateName) {
+                            output = _templatingCode(config, myTemplateName, output);
+                            fileDest = _templatingName(config, myTemplateName, fileDest);
+                        }
+
+                        if (fs.existsSync(fileDest)) {
+                            fs.unlinkSync(fileDest);
+                        }
+                        fs.writeFile(fileDest, output, err => {
+                            if (!err) {
+                                if (serverConfigCode) {
+                                    let destinationPath = config.destConfig;
+                                    if (myTemplateName) {
+                                        serverConfigCode = _templatingCode(
+                                            config,
+                                            myTemplateName,
+                                            serverConfigCode
+                                        );
+                                        destinationPath = _templatingName(
+                                            config,
+                                            myTemplateName,
+                                            destinationPath
+                                        );
+                                    }
+                                    const configDest = path.normalize(
+                                        currentPath + '/' + destinationPath
+                                    );
+                                    if (fs.existsSync(configDest)) {
+                                        fs.unlinkSync(configDest);
+                                    }
+                                    fs.writeFileSync(configDest, serverConfigCode);
+                                }
+
+                                logs.push(color.greenBright('bundle updated successfully'));
+
+                                createJsDocMarkdown(currentPath, finder, logs);
+
+                                _outputLogs(logs);
+                            }
+                        });
+                    }
+                });
+            }
         }
     }
     /**
@@ -248,7 +284,7 @@ function complexCollection(configFileType, nameFilter, templateName) {
                 )}: The template ${templateName} is not defined`
             );
         } else {
-            logs.push(`${color.greenBright('Applied template')}: '${templateName}'`);
+            // logs.push(`${color.greenBright('Applied template')}: '${templateName}'`);
 
             for (const search in config.template[templateName]) {
                 const replacement = config.template[templateName][search];
