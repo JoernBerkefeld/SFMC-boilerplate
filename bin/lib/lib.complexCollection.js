@@ -257,7 +257,11 @@ function complexCollection(configFileType, nameFilter, templateName) {
                                     fs.writeFileSync(configDest, serverConfigCode);
                                 }
 
-                                logs.push(color.greenBright('bundle updated successfully'));
+                                logs.push(
+                                    color.greenBright('bundle updated successfully') +
+                                        ' ' +
+                                        color.blackBright(new Date().toLocaleTimeString())
+                                );
 
                                 createJsDocMarkdown(currentPath, finder, logs);
 
