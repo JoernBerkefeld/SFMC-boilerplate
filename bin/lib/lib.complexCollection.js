@@ -176,15 +176,16 @@ function complexCollection(configFileType, nameFilter, templateName) {
         _outputLogs(logs);
         let templateCounter = 0;
         for (let myTemplateName of templateList) {
+            ssjsCoreLoaded = false;
+            const logs = [];
             let output = '';
+
             if (templateCounter) {
                 logs.push('');
             }
             templateCounter++;
 
             // create script wrapper
-            ssjsCoreLoaded = false;
-            const logs = [];
             if (!config.template || !config.template[myTemplateName]) {
                 myTemplateName = null;
             }
