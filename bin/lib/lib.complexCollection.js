@@ -171,19 +171,24 @@ function complexCollection(configFileType, nameFilter, templateName) {
             // fallback
             templateList.push(null);
         }
+
+        logs.push(`\n\u001b[36m${config.name}\u001b[0m ${color.blackBright('- ' + filePath)}`);
+        _outputLogs(logs);
+        let templateCounter = 0;
         for (let myTemplateName of templateList) {
-            // create script wrapper
             let output = '';
+            if (templateCounter) {
+                logs.push('');
+            }
+            templateCounter++;
+
+            // create script wrapper
             ssjsCoreLoaded = false;
             const logs = [];
             if (!config.template || !config.template[myTemplateName]) {
                 myTemplateName = null;
             }
-            logs.push(
-                `\n\u001b[36m${config.name}\u001b[0m ${
-                    myTemplateName ? ' (' + myTemplateName + ')' : ''
-                } ${color.blackBright('- ' + filePath)}`
-            );
+            logs.push(`Template: ${myTemplateName ? myTemplateName : 'n/a'}`);
 
             const outputLib = loadlib(config, currentPath, finder);
             if (outputLib) {
@@ -260,7 +265,9 @@ function complexCollection(configFileType, nameFilter, templateName) {
                                 logs.push(
                                     color.greenBright('bundle updated successfully') +
                                         ' ' +
-                                        color.blackBright(new Date().toLocaleTimeString())
+                                        color.blackBright(
+                                            new Date().toLocaleTimeString() + ': ' + fileDest
+                                        )
                                 );
 
                                 createJsDocMarkdown(currentPath, finder, logs);
