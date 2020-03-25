@@ -794,6 +794,14 @@ function complexCollection(configFileType, nameFilter, templateName) {
         if (libMode === 'amp') {
             output += ']%%\n';
         }
+        if (configFileName === 'cloudpage.json') {
+            output += `<meta name="application-name" content="${config.name}" data-template="${
+                templateName ? templateName : 'n/a'
+            }" data-created="${new Date()
+                .toISOString()
+                .replace(/T/, ' ')
+                .replace(/\..+/, '')} GMT">\n`;
+        }
         return output;
     }
 }
