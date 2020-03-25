@@ -1,6 +1,6 @@
 {
 	"name": "sfmc-boilerplate",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"description": "set up local dev env for Salesforce Marketing Cloud and create deployment bundles",
 	"scripts": {
 		"upgrade": "npm-check --update",
