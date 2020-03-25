@@ -174,16 +174,12 @@ function complexCollection(configFileType, nameFilter, templateName) {
 
         logs.push(`\n\u001b[36m${config.name}\u001b[0m ${color.blackBright('- ' + filePath)}`);
         _outputLogs(logs);
-        let templateCounter = 0;
         for (let myTemplateName of templateList) {
             ssjsCoreLoaded = false;
             const logs = [];
             let output = '';
 
-            if (templateCounter) {
-                logs.push('');
-            }
-            templateCounter++;
+            logs.push('');
 
             // create script wrapper
             if (!config.template || !config.template[myTemplateName]) {
