@@ -763,7 +763,14 @@ function complexCollection(configFileType, nameFilter, templateName) {
      * @returns {string} file comments
      */
     function _prefixBundle(config, currentPage, libMode, templateName) {
-        const packageJson = require(path.normalize(process.cwd() + '/package.json'));
+        let packageJson = null;
+        try {
+            packageJson = require(path.normalize(process.cwd() + '/package.json'));
+        } catch (ex) {
+            console.log(
+                'Warning: package.json not found. It is recommended that you manage your local dependencies'
+            );
+        }
         if (!libMode) {
             libMode = 'amp';
         }
@@ -779,11 +786,17 @@ function complexCollection(configFileType, nameFilter, templateName) {
             .toISOString()
             .replace(/T/, ' ')
             .replace(/\..+/, '')} GMT\n`;
-        if (packageJson && packageJson.repository) {
-            if ('string' === typeof packageJson.repository) {
-                output += ` *  @repository: ${packageJson.repository}\n`;
-            } else if (packageJson.repository.url) {
-                output += ` *  @repository: ${packageJson.repository.url}\n`;
+        if (packageJson) {
+            if (packageJson.repository) {
+                if ('string' === typeof packageJson.repository) {
+                    output += ` *  @repository: ${packageJson.repository}\n`;
+                } else if (packageJson.repository.url) {
+                    output += ` *  @repository: ${packageJson.repository.url}\n`;
+                }
+            } else {
+                console.log(
+                    'Warning: repository not set in package.json. It is recommended to use versioning on your projects'
+                );
             }
         }
         output += ` *  @path: ${currentPage.split('\\').join('/')}\n */\n`;
