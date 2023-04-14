@@ -49,7 +49,7 @@
 		"eslint-config-prettier": "^6.3.0",
 		"eslint-config-ssjs": "^1.0.5",
 		"eslint-plugin-jsdoc": "^41.1.1",
-		"npm-check": "^5.9.0",
+		"npm-check": "^6.0.1",
 		"prettier": "^1.18.2",
 		"prettier-eslint": "^9.0.0"
 	}
