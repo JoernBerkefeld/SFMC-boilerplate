@@ -42,7 +42,7 @@
 		"cli-color": "^2.0.3",
 		"find": "^0.3.0",
 		"jsdoc-to-markdown": "^8.0.0",
-		"yargs": "^13.3.0"
+		"yargs": "^17.7.1"
 	},
 	"devDependencies": {
 		"eslint": "^6.4.0",
