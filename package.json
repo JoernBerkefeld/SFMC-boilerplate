@@ -39,7 +39,7 @@
 		"sfmc-build": "./bin/index.js"
 	},
 	"dependencies": {
-		"cli-color": "^1.4.0",
+		"cli-color": "^2.0.3",
 		"find": "^0.3.0",
 		"jsdoc-to-markdown": "^8.0.0",
 		"yargs": "^13.3.0"
